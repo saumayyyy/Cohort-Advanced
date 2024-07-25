@@ -1,0 +1,29 @@
+{
+  "devDependencies": {
+    "@types/pg": "^8.11.6"
+  },
+  "name": "porstgres-joins",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "obuf": "^1.1.2",
+    "pg": "^8.12.0",
+    "pg-int8": "^1.0.1",
+    "pg-numeric": "^1.0.2",
+    "pg-protocol": "^1.6.1",
+    "pg-types": "^4.0.2",
+    "postgres-array": "^3.0.2",
+    "postgres-bytea": "^3.0.0",
+    "postgres-date": "^2.1.0",
+    "postgres-interval": "^3.0.0",
+    "postgres-range": "^1.1.4",
+    "undici-types": "^5.26.5"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
