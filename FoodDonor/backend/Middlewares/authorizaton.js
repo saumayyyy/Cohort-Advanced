@@ -8,7 +8,7 @@ async function auth(req,res,next){
        //extract token 
        const token = req.cookies.token 
        || req.body.token 
-       || req.headers("Authorization").replace("Bearer ","");
+       || req.header("Authorization").replace("Bearer ","");
 
        if(!token){
         return res.status(401).json({
@@ -18,6 +18,7 @@ async function auth(req,res,next){
        }
        //verify the token
        try {
+        console.log(token);
         const decode = jwt.verify(token,process.env.JWT_SECRET);
         console.log(decode);//this will contain role of the user
         req.user = decode; 

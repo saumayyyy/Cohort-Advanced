@@ -12,22 +12,33 @@ const createEvent = async (req, res) => {
 
     // Validation
     if (!title || !typeOfFood || !quantity || !location || !contactDetails || !eventDate) {
-      return res.status(400).json({ message: 'All fields are required' });
+      return res.status(400).json({ 
+        success:false,
+        message: 'All fields are required' 
+      });
     }
 
     if (!['veg', 'non-veg'].includes(typeOfFood)) {
-      return res.status(400).json({ message: 'Invalid type of food' });
+      return res.status(400).json({ 
+        success:false,
+        message: 'Invalid type of food' });
     }
 
     if (quantity <= 0) {
-      return res.status(400).json({ message: 'Quantity must be a positive number' });
+      return res.status(400).json({ 
+        success:false,
+        message: 'Quantity must be a positive number' });
     }
 
     if (!['Delhi', 'Mumbai', 'Pune', 'Bengaluru', 'Chennai'].includes(location)) {
-      return res.status(400).json({ message: 'Invalid location' });
+      return res.status(400).json({ 
+        success:false,
+        message: 'Invalid location' });
     }
     if (!image) {
-      return res.status(400).json({ message: 'Image is required' });
+      return res.status(400).json({ 
+        success:false,
+        message: 'Image is required' });
     }
     const donorDetails = await User.findById(userId, {
       role: "Donor",
@@ -53,10 +64,14 @@ const createEvent = async (req, res) => {
       image: uploadResult.secure_url, // Set image URL from Cloudinary
       eventDate,
     });
-    res.status(201).json({ message: 'Event created successfully', event: newEvent });
+    res.status(201).json({ 
+      success:true,
+      message: 'Event created successfully', event: newEvent });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error creating event', error: error.message });
+    res.status(500).json({ 
+      success:false,
+      message: 'Error creating event', error: error.message });
   }
 };
 
@@ -68,12 +83,18 @@ const deleteEvent = async (req, res) => {
       const event = await EventCard.findOneAndDelete({ _id: id, donorId: req.user.id });
   
       if (!event) {
-        return res.status(404).json({ message: 'Event not found or not authorized' });
+        return res.status(404).json({ 
+          success:false,
+          message: 'Event not found or not authorized' });
       }
   
-      res.json({ message: 'Event deleted successfully' });
+      res.json({ 
+        success:true,
+        message: 'Event deleted successfully' });
     } catch (error) {
-      res.status(500).json({ message: 'Error deleting event', error: error.message });
+      res.status(500).json({ 
+        success:false,
+        message: 'Error deleting event', error: error.message });
     }
   };
 
@@ -83,7 +104,9 @@ const getDonorEvents = async (req, res) => {
       const events = await EventCard.find({ donorId: req.user.id });
       res.json(events);
     } catch (error) {
-      res.status(500).json({ message: 'Error fetching events', error: error.message });
+      res.status(500).json({
+        success:false, 
+        message: 'Error fetching events', error: error.message });
     }
   };
 
@@ -94,7 +117,9 @@ const getAllEvents = async (req, res) => {
       const events = await EventCard.find();
       return res.json(events);
     } catch (error) {
-      return res.status(500).json({ message: 'Error fetching events', error: error.message });
+      return res.status(500).json({
+        success:false,
+        message: 'Error fetching events', error: error.message });
     }
   };
 
@@ -105,7 +130,9 @@ const getEventsByLocation = async (req, res) => {
       const events = await EventCard.find({ location });
       return res.json(events);
     } catch (error) {
-      return res.status(500).json({ message: 'Error fetching events', error: error.message });
+      return res.status(500).json({ 
+        success:false,
+        message: 'Error fetching events', error: error.message });
     }
   };
 
@@ -116,11 +143,15 @@ const markEventAsCompleted = async (req, res) => {
 
     const event = await EventCard.findById(eventId);
     if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
+      return res.status(404).json({ 
+        success:false,
+        message: 'Event not found' });
     }
 
     if (event.status === 'completed') {
-      return res.status(400).json({ message: 'Event already completed' });
+      return res.status(400).json({ 
+        success:false,
+        message: 'Event already completed' });
     }
 
     // Update the event status
@@ -129,25 +160,25 @@ const markEventAsCompleted = async (req, res) => {
 
     // Award points to the donor
     const donor = await User.findById(event.donorId);
-    const donorPoints = 50 * event.quantity;
-    donor.totalPoints += donorPoints;
-    donor.completedEventsPoints.push({ eventId: event._id, points: donorPoints });
+    donor.points += 50 * event.quantity;
     await donor.save();
 
     // Award points to the volunteers
     for (let v of event.volunteers) {
       if (v.status === 'accepted') {
         const volunteer = await User.findById(v.volunteerId);
-        const volunteerPoints = event.quantity * 10;
-        volunteer.totalPoints += volunteerPoints;
-        volunteer.completedEventsPoints.push({ eventId: event._id, points: volunteerPoints });
+        volunteer.points += event.quantity * 10;
         await volunteer.save();
       }
     }
 
-    res.json(event);
+    res.json(
+      {success:false,
+      event});
   } catch (error) {
-    res.status(500).json({ message: 'Error marking event as completed', error: error.message });
+    res.status(500).json({ 
+      success:false,
+      message: 'Error marking event as completed', error: error.message });
   }
 };
 
@@ -159,13 +190,19 @@ const getEventById = async (req, res) => {
     const event = await EventCard.findById(id).populate('volunteers.volunteerId', 'name email');
 
     if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
+      return res.status(404).json({ 
+        success:false,
+        message: 'Event not found' });
     }
 
-    res.json(event);
+    res.json({
+      success:true,
+      event});
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error fetching event', error: error.message });
+    res.status(500).json({
+      success:false,
+      message: 'Error fetching event', error: error.message });
   }
 };
 

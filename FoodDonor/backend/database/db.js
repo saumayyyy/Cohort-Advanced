@@ -43,20 +43,7 @@ const userSchema = new mongoose.Schema({
   totalPoints: {
     type: Number,
     default: 0
-  },
-  completedEventsPoints: [
-    {
-      eventId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'EventCard',
-        required: true
-      },
-      points: {
-        type: Number,
-        required: true
-      }
-    }
-  ]
+  }
 });
   const eventCardSchema = new mongoose.Schema({
     donorId: {

@@ -10,16 +10,23 @@ const getUserDetails = async (req, res) => {
         .select('-password'); // Exclude password from the response
   
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({
+          success:false,
+          message: 'User not found' });
       }
   
       // Find all events created by the user if they are a donor
       const events = await EventCard.find({ donorId: userId });
   
-      res.json({ user, events });
+      res.json({ 
+        success:true,
+        user, 
+        events });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Error fetching user details', error: error.message });
+      res.status(500).json({ 
+        success:false,
+        message: 'Error fetching user details', error: error.message });
     }
   };
 
