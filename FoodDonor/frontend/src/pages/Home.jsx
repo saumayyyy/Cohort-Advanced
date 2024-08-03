@@ -120,7 +120,7 @@ function Home(){
 
 
             {/* {section-2} */}
-            <div className="bg-pure-greys-5 text-richblack-700 mt-10">
+            <div className="bg-richblack-900 text-richblack-5 mt-10">
                 <div className="mx-auto w-11/12 max-w-maxContent flex flex-col items-center justify-between gap-7">
                         <div className="flex gap-5 mb-10 mt-[95px] justify-between">
                             <div className="text-4xl font-semibold w-[45%]">
@@ -128,7 +128,7 @@ function Home(){
                                 <HighlightText text={"Difference in Your Community"}/>
                             </div>
                             <div className="flex flex-col gap-10 w-[40%] items-start">
-                                <div className="text-lg font-semibold">
+                                <div className="text-lg font-semibold text-richblack-200">
                                 Our platform empowers you to develop the essential skills for organizing impactful food donation events and volunteering effectively. 
                                 Get involved, enhance your abilities, and help address food insecurity in your area.
                                 </div>

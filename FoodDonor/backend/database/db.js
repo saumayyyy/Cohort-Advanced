@@ -1,5 +1,11 @@
 const mongoose = require("mongoose");
-mongoose.connect('mongodb+srv://saumayaggarwal2:SLRCiOhh6VpVnPOF@cluster0.fp1ai9x.mongodb.net/FoodDonor')
+require("dotenv").config();
+
+const {DB_URL} = process.env;
+
+
+
+mongoose.connect(DB_URL)
   .then(() => console.log("Database connected successfully"))
   .catch(err => console.error("Database connection error: ", err));
 const userSchema = new mongoose.Schema({

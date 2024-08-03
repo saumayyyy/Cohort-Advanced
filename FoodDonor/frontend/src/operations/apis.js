@@ -1,4 +1,4 @@
-const BASE_URL = process.env.REACT_APP_BASE_URL;
+const BASE_URL = "http://localhost:4000/api/v1";
 
 //AUTH endpoints
 export const endpoints = {
@@ -19,14 +19,15 @@ export const eventEndpoints = {
     GET_DONOR_EVENTS_API : BASE_URL+"/event/donor",
     GET_LOCATION_EVENTS_API: BASE_URL+"/event/location/:location",
     GET_ALL_EVENTS_API : BASE_URL+"/event",
-    MARK_EVENT_COMPLETED_API: BASE_URL+"/event/:id/status",
-    GET_EVENT_BY_ID_API: BASE_URL+"/event/:id"
+    MARK_EVENT_COMPLETED_API: BASE_URL+"/event",
+    GET_EVENT_BY_ID_API: BASE_URL+"/event"
 }
 
 
 export const volunteerEndpoints = {
     REGISTER_VOLUNTEER_API : BASE_URL+"/event/:eventId/volunteers/register",
     UNREGISTER_VOLUNTEER_API : BASE_URL+"/event/volunteers/unregister/:eventId",
-    UPDATE_VOLUNTEER_STATUS : BASE_URL+"event/volunteers/:volunteerId/status/:eventId"
+    UPDATE_VOLUNTEER_STATUS : BASE_URL+"/event/volunteers/:volunteerId/status/:eventId",
+    GET_VOLUNTEER_EVENTS : BASE_URL+"/volunteer/events"
 }
 
