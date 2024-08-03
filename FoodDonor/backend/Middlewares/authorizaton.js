@@ -6,9 +6,9 @@ const {User} = require("../database/db")
 async function auth(req,res,next){
     try {
        //extract token 
-       const token = req.cookies.token 
+       const token =  req.header("Authorization").replace("Bearer ","")
        || req.body.token 
-       || req.header("Authorization").replace("Bearer ","");
+       || req.cookies.token;
 
        if(!token){
         return res.status(401).json({
@@ -18,9 +18,7 @@ async function auth(req,res,next){
        }
        //verify the token
        try {
-        console.log(token);
         const decode = jwt.verify(token,process.env.JWT_SECRET);
-        console.log(decode);//this will contain role of the user
         req.user = decode; 
        } catch (error) {
         console.log(error)

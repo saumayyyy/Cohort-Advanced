@@ -5,6 +5,7 @@ const updateVolunteerStatus = async (req, res) => {
   try {
     const { eventId, volunteerId } = req.params;
     const { status } = req.body; // status can be 'accepted' or 'rejected'
+    console.log("Inside Update volunteer status")
 
     if (!['accepted', 'rejected'].includes(status)) {
       return res.status(400).json({ 
@@ -126,27 +127,16 @@ const getVolunteerEvents = async (req, res) => {
     // Find events where the volunteer is registered
     const events = await EventCard.find({ 
       "volunteers.volunteerId": volunteerId 
-    })
-    .select('-volunteers') // Exclude the volunteers field
+    });
 
-    // Map the results to only include the volunteer's status
-    const eventsWithVolunteerStatus = await Promise.all(events.map(async (event) => {
+    // Map the results to include the entire event object and the volunteer's status
+    const eventsWithVolunteerStatus = events.map((event) => {
       const volunteerDetails = event.volunteers.find(v => v.volunteerId.toString() === volunteerId);
       return {
-        _id: event._id,
-        donorId: event.donorId,
-        title: event.title,
-        typeOfFood: event.typeOfFood,
-        quantity: event.quantity,
-        location: event.location,
-        contactDetails: event.contactDetails,
-        status: event.status,
-        image: event.image,
-        createdAt: event.createdAt,
-        eventDate: event.eventDate,
+        ...event._doc, // Spread the entire event object
         volunteerStatus: volunteerDetails ? volunteerDetails.status : null,
       };
-    }));
+    });
 
     res.json({
       success: true,
@@ -161,5 +151,8 @@ const getVolunteerEvents = async (req, res) => {
     });
   }
 };
+
+
+
 
 module.exports = { updateVolunteerStatus, registerVolunteer, unregisterVolunteer ,getVolunteerEvents};

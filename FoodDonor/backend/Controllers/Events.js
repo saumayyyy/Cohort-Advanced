@@ -2,7 +2,7 @@ const {uploadImageToCloudinary} = require("../Utilities/ImageUploader");
 const {EventCard }= require("../database/db");
 require("dotenv").config()
 const {User} = require("../database/db")
-
+const jwt = require("jsonwebtoken");
 //create Event->donor specific
 const createEvent = async (req, res) => {
   try {
@@ -102,7 +102,9 @@ const deleteEvent = async (req, res) => {
 const getDonorEvents = async (req, res) => {
     try {
       const events = await EventCard.find({ donorId: req.user.id });
-      res.json(events);
+      res.json(
+        {success:true,
+        events});
     } catch (error) {
       res.status(500).json({
         success:false, 
@@ -115,7 +117,9 @@ const getDonorEvents = async (req, res) => {
 const getAllEvents = async (req, res) => {
     try {
       const events = await EventCard.find();
-      return res.json(events);
+      return res.json(
+        {success:true,
+        events});
     } catch (error) {
       return res.status(500).json({
         success:false,
@@ -128,7 +132,9 @@ const getEventsByLocation = async (req, res) => {
     try {
       const { location } = req.params;
       const events = await EventCard.find({ location });
-      return res.json(events);
+      return res.json(
+        {success:true,
+        events});
     } catch (error) {
       return res.status(500).json({ 
         success:false,
@@ -142,16 +148,19 @@ const markEventAsCompleted = async (req, res) => {
     const { eventId } = req.params;
 
     const event = await EventCard.findById(eventId);
+    console.log("Event: ", event); // Debugging log
     if (!event) {
       return res.status(404).json({ 
-        success:false,
-        message: 'Event not found' });
+        success: false,
+        message: 'Event not found' 
+      });
     }
 
     if (event.status === 'completed') {
       return res.status(400).json({ 
-        success:false,
-        message: 'Event already completed' });
+        success: false,
+        message: 'Event already completed' 
+      });
     }
 
     // Update the event status
@@ -160,49 +169,79 @@ const markEventAsCompleted = async (req, res) => {
 
     // Award points to the donor
     const donor = await User.findById(event.donorId);
-    donor.points += 50 * event.quantity;
+    console.log("Donor before update: ", donor); // Debugging log
+    donor.totalPoints += 50 * event.quantity;
     await donor.save();
+    console.log("Donor after update: ", donor); // Debugging log
 
     // Award points to the volunteers
     for (let v of event.volunteers) {
       if (v.status === 'accepted') {
         const volunteer = await User.findById(v.volunteerId);
-        volunteer.points += event.quantity * 10;
+        console.log("Volunteer before update: ", volunteer); // Debugging log
+        volunteer.totalPoints += event.quantity * 10;
         await volunteer.save();
+        console.log("Volunteer after update: ", volunteer); // Debugging log
       }
     }
 
-    res.json(
-      {success:false,
-      event});
+    res.json({
+      success: true,
+      event
+    });
   } catch (error) {
     res.status(500).json({ 
-      success:false,
-      message: 'Error marking event as completed', error: error.message });
+      success: false,
+      message: 'Error marking event as completed', 
+      error: error.message 
+    });
   }
 };
+
 
 const getEventById = async (req, res) => {
   try {
     const { id } = req.params;
+    const token = req.headers.authorization?.split(" ")[1];
+    let userRole = 'volunteer';
 
-    // Find the event by ID and populate the volunteers field
-    const event = await EventCard.findById(id).populate('volunteers.volunteerId', 'name email');
+    // Check for token
+    if (token) {
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decodedToken.id);
+
+      if (user && user.role === 'donor') {
+        userRole = 'donor';
+      }
+    }
+
+    // Find the event by ID
+    let event;
+    if (userRole === 'donor') {
+      event = await EventCard.findById(id).populate('volunteers.volunteerId', 'name email status');
+    } else {
+      event = await EventCard.findById(id);
+    }
 
     if (!event) {
       return res.status(404).json({ 
-        success:false,
-        message: 'Event not found' });
+        success: false,
+        message: 'Event not found' 
+      });
     }
 
     res.json({
-      success:true,
-      event});
+      success: true,
+      event,
+      userRole
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      success:false,
-      message: 'Error fetching event', error: error.message });
+      success: false,
+      message: 'Error fetching event', 
+      error: error.message 
+    });
   }
 };
 
